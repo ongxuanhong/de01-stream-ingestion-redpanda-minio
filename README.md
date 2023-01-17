@@ -3,5 +3,8 @@
 make up
 
 # checking redpanda console
-make to_redpanda_console
+make to_redpanda
+
+# checking minio
+make to_minio
 ```
