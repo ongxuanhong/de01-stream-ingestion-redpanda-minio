@@ -1,0 +1,35 @@
+version: "3.7"
+services:
+  redpanda:
+    image: vectorized/redpanda
+    container_name: redpanda
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - "1G"
+      - --reserve-memory
+      - "0M"
+      - --node-id
+      - "0"
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://redpanda:29092,OUTSIDE://redpanda:9092
+      - --check=false
+
+  redpanda-console:
+    image: vectorized/console
+    container_name: redpanda_console
+    depends_on:
+      - redpanda
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
