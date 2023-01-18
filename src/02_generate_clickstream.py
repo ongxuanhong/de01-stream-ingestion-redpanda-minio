@@ -7,17 +7,28 @@ import pandas as pd
 from kafka import KafkaProducer
 from kafka.admin import KafkaAdminClient, NewTopic
 
-# Create kafka topics if running in Docker.
-BOOTSTRAP_SERVERS = "localhost:9092"
-admin_client = KafkaAdminClient(bootstrap_servers=BOOTSTRAP_SERVERS)
+# Create kafka topics
+BOOTSTRAP_SERVERS = "redpanda:9092"
+
+EVENTS_TOPIC_NAME = "clickstream_events"
+
+MOCK_EVENTS = [
+    "email_click",
+    "link_1_click",
+    "link_2_click",
+    "pdf_download",
+    "video_play",
+    "website_visit",
+]
+
+admin_client = KafkaAdminClient(bootstrap_servers=BOOTSTRAP_SERVERS, client_id="user-event-producer")
 
 # Check if topic already exists first
-event_name = "clickstream_events"
 existing_topics = admin_client.list_topics()
-if event_name not in existing_topics:
-    print("Create topic:", event_name)
+if EVENTS_TOPIC_NAME not in existing_topics:
+    print("Create topic:", EVENTS_TOPIC_NAME)
     admin_client.create_topics(
-        [NewTopic(event_name, num_partitions=1, replication_factor=1)]
+        [NewTopic(EVENTS_TOPIC_NAME, num_partitions=1, replication_factor=1)]
     )
 
 load_dtypes = {
@@ -49,28 +60,22 @@ for i, daily in enumerate(ls_daily):
         ls_customers = pd_load["customer_id"].unique()
         print("-Number of customers:", len(ls_customers))
 
-        for key in ls_customers:
+        for j, cust in enumerate(ls_customers):
             # Generate randomized user event data for a non-existing website
             data = {
-                "timestamp": datetime.now().isoformat(),  # ISO 8601 timestamp, because Trino can only parse this
-                "event_name": random.choice([
-                    "email_click",
-                    "link_1_click",
-                    "link_2_click",
-                    "pdf_download",
-                    "video_play",
-                    "website_visit",
-                ]),
+                "timestamp": datetime.now().isoformat(),
+                "daily": daily,
+                "EVENTS_TOPIC_NAME": random.choice(MOCK_EVENTS),
                 "event_value": random.randint(0, 1),
             }
 
             # Send the data to the Redpanda topic
-            key = key.encode("utf-8")
+            key = cust.encode("utf-8")
             value = json.dumps(data).encode("utf-8")
-            producer.send(event_name, key=key, value=value)
+            producer.send(EVENTS_TOPIC_NAME, key=key, value=value)
 
-        print(
-            f"Sent data to Redpanda topic {event_name}: {key} - {value}, sleeping for 1 second"
-        )
+            print(
+                f"{i}.{j}. Sent data to Redpanda topic {EVENTS_TOPIC_NAME}: {key} - {value}, sleeping for 3 second"
+            )
 
-        sleep(1)
+        sleep(3)

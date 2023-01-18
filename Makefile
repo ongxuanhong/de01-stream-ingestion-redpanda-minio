@@ -19,4 +19,7 @@ to_minio:
 	open http://localhost:9001/buckets
 
 to_mysql:
-	docker exec -it mysql mysql -u"root" -p"${MYSQL_ROOT_PASSWORD}" ${MYSQL_DATABASE}	
+	docker exec -it mysql mysql -u"root" -p"${MYSQL_ROOT_PASSWORD}" ${MYSQL_DATABASE}
+
+to_data_generator:
+	docker exec -it data_generator /bin/bash

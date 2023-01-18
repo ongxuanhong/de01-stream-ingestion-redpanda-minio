@@ -47,7 +47,7 @@ print(pd_orders.shape)
 
 # setup MySQL connection
 mysql_db_params = {
-    "host": "localhost",
+    "host": "mysql",
     "port": "3306",
     "database": "brazillian_ecommerce",
     "user": "root",
