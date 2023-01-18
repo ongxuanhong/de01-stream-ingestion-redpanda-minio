@@ -102,3 +102,10 @@ curl --request POST \
   }
 }'
 ```
+
+# Wrapup setup connectors
+```bash
+cd src/
+chmod +x setup_connectors.sh
+./setup_connectors.sh
+```
