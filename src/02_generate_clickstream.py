@@ -58,19 +58,21 @@ for i, daily in enumerate(ls_daily):
         print("Getting clickstream data on:", daily)
         pd_load = pd_orders.query(f"daily == '{daily}'")
         ls_customers = pd_load["customer_id"].unique()
-        print("-Number of customers:", len(ls_customers))
+        n_customers = len(ls_customers)
+        print("-Number of customers:", n_customers)
 
         for j, cust in enumerate(ls_customers):
             # Generate randomized user event data for a non-existing website
             data = {
                 "timestamp": datetime.now().isoformat(),
                 "daily": daily,
+                "customer": cust,
                 "EVENTS_TOPIC_NAME": random.choice(MOCK_EVENTS),
                 "event_value": random.randint(0, 1),
             }
 
             # Send the data to the Redpanda topic
-            key = cust.encode("utf-8")
+            key = str(random.randint(0, n_days * n_customers)).encode("utf-8")
             value = json.dumps(data).encode("utf-8")
             producer.send(EVENTS_TOPIC_NAME, key=key, value=value)
 
