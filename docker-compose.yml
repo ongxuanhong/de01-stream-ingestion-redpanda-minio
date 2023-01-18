@@ -69,3 +69,13 @@ services:
       - "3306:3306"
     env_file:
       - .env
+
+  kafka-connect:
+    image: debezium/connect
+    container_name: kafka_connect
+    depends_on:
+      - redpanda
+    ports:
+      - "8083:8083"
+    env_file:
+      - .env
