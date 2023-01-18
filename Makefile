@@ -1,5 +1,8 @@
 include .env
 
+build:
+	docker-compose build
+
 up:
 	docker-compose --env-file .env up -d
 

@@ -71,7 +71,9 @@ services:
       - .env
 
   kafka-connect:
-    image: debezium/connect
+    build:
+      context: ./kafka
+      dockerfile: ./Dockerfile
     container_name: kafka_connect
     depends_on:
       - redpanda
